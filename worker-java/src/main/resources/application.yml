@@ -1,0 +1,64 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: worker-orders-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: order-processing-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      max-poll-records: 10
+      properties:
+        session.timeout.ms: 30000
+        heartbeat.interval.ms: 10000
+    listener:
+      ack-mode: manual
+      concurrency: 3
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/global_mobility-apex-ecommerce
+      auto-index-creation: true
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: -1ms
+
+kafka:
+  topics:
+    orders: orders-topic
+
+external:
+  api:
+    base-url: http://localhost:8080
+    timeout: 5000
+    retry:
+      max-attempts: 3
+      backoff-delay: 1000
+
+redis:
+  lock:
+    timeout: 30000
+    retry-interval: 100
+
+logging:
+  level:
+    root: INFO
+    com.globalmobilityapex.worker: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.data.mongodb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
